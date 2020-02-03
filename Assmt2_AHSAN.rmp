@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="9.5.001">
+  <context>
+    <input>
+      <location>//Local Repository/Assignment2- new/Grocery</location>
+    </input>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="9.5.001" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="retrieve" compatibility="9.5.001" expanded="true" height="68" name="Retrieve Grocery" width="90" x="45" y="34">
+        <parameter key="repository_entry" value="//Local Repository/Assignment2- new/Grocery"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="9.5.001" expanded="true" height="103" name="Filter Examples" width="90" x="179" y="34">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="no_missing_attributes"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list"/>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="9.5.001" expanded="true" height="82" name="Subprocess" width="90" x="313" y="34">
+        <process expanded="true">
+          <operator activated="true" class="map" compatibility="9.5.001" expanded="true" height="82" name="Map" width="90" x="45" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Gender"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <list key="value_mappings">
+              <parameter key="F" value="Female"/>
+              <parameter key="M" value="Male"/>
+            </list>
+            <parameter key="consider_regular_expressions" value="false"/>
+            <parameter key="add_default_mapping" value="false"/>
+            <description align="center" color="transparent" colored="false" width="126">Gender Modification&lt;br/&gt;</description>
+          </operator>
+          <operator activated="true" class="map" compatibility="9.5.001" expanded="true" height="82" name="Map (2)" width="90" x="179" y="34">
+            <parameter key="attribute_filter_type" value="single"/>
+            <parameter key="attribute" value="Product Category"/>
+            <parameter key="attributes" value=""/>
+            <parameter key="use_except_expression" value="false"/>
+            <parameter key="value_type" value="attribute_value"/>
+            <parameter key="use_value_type_exception" value="false"/>
+            <parameter key="except_value_type" value="time"/>
+            <parameter key="block_type" value="attribute_block"/>
+            <parameter key="use_block_type_exception" value="false"/>
+            <parameter key="except_block_type" value="value_matrix_row_start"/>
+            <parameter key="invert_selection" value="false"/>
+            <parameter key="include_special_attributes" value="false"/>
+            <list key="value_mappings">
+              <parameter key="Foods" value="Food"/>
+              <parameter key="Drinks" value="Drink"/>
+              <parameter key="None Consumable" value="Non-Consumable"/>
+            </list>
+            <parameter key="consider_regular_expressions" value="false"/>
+            <parameter key="add_default_mapping" value="false"/>
+            <description align="center" color="transparent" colored="false" width="126">Product Category modificaion&lt;br/&gt;</description>
+          </operator>
+          <connect from_port="in 1" to_op="Map" to_port="example set input"/>
+          <connect from_op="Map" from_port="example set output" to_op="Map (2)" to_port="example set input"/>
+          <connect from_op="Map (2)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="false" class="anomalydetection:k-NN Global Anomaly Score" compatibility="2.4.001" expanded="true" height="103" name="k-NN Global Anomaly Score" width="90" x="45" y="289">
+        <parameter key="k" value="10"/>
+        <parameter key="use k-th neighbor distance only (no average)" value="false"/>
+        <parameter key="measure_types" value="MixedMeasures"/>
+        <parameter key="mixed_measure" value="MixedEuclideanDistance"/>
+        <parameter key="nominal_measure" value="NominalDistance"/>
+        <parameter key="numerical_measure" value="EuclideanDistance"/>
+        <parameter key="divergence" value="GeneralizedIDivergence"/>
+        <parameter key="kernel_type" value="radial"/>
+        <parameter key="kernel_gamma" value="1.0"/>
+        <parameter key="kernel_sigma1" value="1.0"/>
+        <parameter key="kernel_sigma2" value="0.0"/>
+        <parameter key="kernel_sigma3" value="2.0"/>
+        <parameter key="kernel_degree" value="3.0"/>
+        <parameter key="kernel_shift" value="1.0"/>
+        <parameter key="kernel_a" value="1.0"/>
+        <parameter key="kernel_b" value="0.0"/>
+        <parameter key="parallelize evaluation process" value="false"/>
+        <parameter key="number of threads" value="8"/>
+      </operator>
+      <operator activated="false" class="anomalydetection:Histogram-based Outlier Score (HBOS)" compatibility="2.4.001" expanded="true" height="82" name="Histogram-based Outlier Score (HBOS)" width="90" x="45" y="391">
+        <parameter key="parameter mode" value="all"/>
+        <list key="histogram properties">
+          <parameter key="Annual Income" value="fixed binwidth.nominal"/>
+          <parameter key="Customer ID" value="fixed binwidth.nominal"/>
+          <parameter key="Gender" value="fixed binwidth.nominal"/>
+          <parameter key="Product Category" value="fixed binwidth.nominal"/>
+          <parameter key="Purchase Date" value="fixed binwidth.-1"/>
+          <parameter key="Revenue" value="fixed binwidth.nominal"/>
+          <parameter key="Transaction" value="fixed binwidth.nominal"/>
+          <parameter key="Units Sold" value="fixed binwidth.nominal"/>
+        </list>
+        <parameter key="number of bins" value="-1"/>
+        <parameter key="select mode" value="fixed binwidth"/>
+        <parameter key="ranked mode" value="false"/>
+        <parameter key="use log scale (better precision)" value="true"/>
+      </operator>
+      <operator activated="false" class="detect_outlier_lof" compatibility="9.5.001" expanded="true" height="82" name="Detect Outlier (LOF)" width="90" x="45" y="493">
+        <parameter key="minimal_points_lower_bound" value="10"/>
+        <parameter key="minimal_points_upper_bound" value="20"/>
+        <parameter key="distance_function" value="euclidian distance"/>
+      </operator>
+      <operator activated="false" class="multiply" compatibility="9.5.001" expanded="true" height="68" name="Multiply (2)" width="90" x="45" y="187"/>
+      <operator activated="false" class="numerical_to_polynominal" compatibility="9.5.001" expanded="true" height="82" name="Numerical to Polynominal" width="90" x="45" y="595">
+        <parameter key="attribute_filter_type" value="all"/>
+        <parameter key="attribute" value=""/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="numeric"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="real"/>
+        <parameter key="block_type" value="value_series"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_series_end"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="9.5.001" expanded="true" height="124" name="Multiply" width="90" x="447" y="34"/>
+      <operator activated="true" class="detect_outlier_distances" compatibility="9.5.001" expanded="true" height="82" name="Detect Outlier (Distances)" width="90" x="581" y="391">
+        <parameter key="number_of_neighbors" value="10"/>
+        <parameter key="number_of_outliers" value="10"/>
+        <parameter key="distance_function" value="euclidian distance"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="9.5.001" expanded="true" height="103" name="Filter Examples (2)" width="90" x="447" y="544">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="custom_filters"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list">
+          <parameter key="filters_entry_key" value="outlier.equals.false"/>
+        </list>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="9.5.001" expanded="true" height="124" name="Multiply (3)" width="90" x="648" y="544"/>
+      <operator activated="true" class="aggregate" compatibility="9.5.001" expanded="true" height="82" name="Aggregate (2)" width="90" x="782" y="646">
+        <parameter key="use_default_aggregation" value="false"/>
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="Units Sold"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="default_aggregation_function" value="average"/>
+        <list key="aggregation_attributes">
+          <parameter key="Revenue" value="average"/>
+          <parameter key="Revenue" value="median"/>
+          <parameter key="Revenue" value="mode"/>
+          <parameter key="Revenue" value="minimum"/>
+          <parameter key="Revenue" value="maximum"/>
+          <parameter key="Revenue" value="standard_deviation"/>
+          <parameter key="Revenue" value="percentile (5)"/>
+          <parameter key="Revenue" value="percentile (10)"/>
+          <parameter key="Revenue" value="percentile (25)"/>
+          <parameter key="Revenue" value="percentile (50)"/>
+          <parameter key="Revenue" value="percentile (75)"/>
+          <parameter key="Revenue" value="percentile (90)"/>
+          <parameter key="Revenue" value="percentile (95)"/>
+        </list>
+        <parameter key="group_by_attributes" value=""/>
+        <parameter key="count_all_combinations" value="false"/>
+        <parameter key="only_distinct" value="false"/>
+        <parameter key="ignore_missings" value="true"/>
+      </operator>
+      <operator activated="true" class="aggregate" compatibility="9.5.001" expanded="true" height="82" name="Aggregate" width="90" x="715" y="442">
+        <parameter key="use_default_aggregation" value="false"/>
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="Units Sold"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="default_aggregation_function" value="average"/>
+        <list key="aggregation_attributes">
+          <parameter key="Units Sold" value="average"/>
+          <parameter key="Units Sold" value="median"/>
+          <parameter key="Units Sold" value="mode"/>
+          <parameter key="Units Sold" value="minimum"/>
+          <parameter key="Units Sold" value="maximum"/>
+          <parameter key="Units Sold" value="standard_deviation"/>
+          <parameter key="Units Sold" value="percentile (5)"/>
+          <parameter key="Units Sold" value="percentile (10)"/>
+          <parameter key="Units Sold" value="percentile (25)"/>
+          <parameter key="Units Sold" value="percentile (50)"/>
+          <parameter key="Units Sold" value="percentile (75)"/>
+          <parameter key="Units Sold" value="percentile (90)"/>
+          <parameter key="Units Sold" value="percentile (95)"/>
+        </list>
+        <parameter key="group_by_attributes" value=""/>
+        <parameter key="count_all_combinations" value="false"/>
+        <parameter key="only_distinct" value="false"/>
+        <parameter key="ignore_missings" value="true"/>
+      </operator>
+      <operator activated="true" class="filter_examples" compatibility="9.5.001" expanded="true" height="103" name="Filter Examples (3)" width="90" x="179" y="289">
+        <parameter key="parameter_expression" value=""/>
+        <parameter key="condition_class" value="custom_filters"/>
+        <parameter key="invert_filter" value="false"/>
+        <list key="filters_list">
+          <parameter key="filters_entry_key" value="Revenue.lt.55"/>
+        </list>
+        <parameter key="filters_logic_and" value="true"/>
+        <parameter key="filters_check_metadata" value="true"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="9.5.001" expanded="true" height="124" name="Multiply (4)" width="90" x="313" y="289"/>
+      <operator activated="true" class="aggregate" compatibility="9.5.001" expanded="true" height="82" name="Stat Unit Sold" width="90" x="447" y="187">
+        <parameter key="use_default_aggregation" value="false"/>
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="Units Sold"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="default_aggregation_function" value="average"/>
+        <list key="aggregation_attributes">
+          <parameter key="Units Sold" value="average"/>
+          <parameter key="Units Sold" value="median"/>
+          <parameter key="Units Sold" value="mode"/>
+          <parameter key="Units Sold" value="minimum"/>
+          <parameter key="Units Sold" value="maximum"/>
+          <parameter key="Units Sold" value="standard_deviation"/>
+          <parameter key="Units Sold" value="percentile (5)"/>
+          <parameter key="Units Sold" value="percentile (10)"/>
+          <parameter key="Units Sold" value="percentile (25)"/>
+          <parameter key="Units Sold" value="percentile (50)"/>
+          <parameter key="Units Sold" value="percentile (75)"/>
+          <parameter key="Units Sold" value="percentile (90)"/>
+          <parameter key="Units Sold" value="percentile (95)"/>
+        </list>
+        <parameter key="group_by_attributes" value=""/>
+        <parameter key="count_all_combinations" value="false"/>
+        <parameter key="only_distinct" value="false"/>
+        <parameter key="ignore_missings" value="true"/>
+        <description align="center" color="transparent" colored="false" width="126">Stat of Units Sold&lt;br&gt;(Manual Outlier)&lt;br/&gt;</description>
+      </operator>
+      <operator activated="true" class="aggregate" compatibility="9.5.001" expanded="true" height="82" name="Stats Revenue" width="90" x="447" y="340">
+        <parameter key="use_default_aggregation" value="false"/>
+        <parameter key="attribute_filter_type" value="single"/>
+        <parameter key="attribute" value="Units Sold"/>
+        <parameter key="attributes" value=""/>
+        <parameter key="use_except_expression" value="false"/>
+        <parameter key="value_type" value="attribute_value"/>
+        <parameter key="use_value_type_exception" value="false"/>
+        <parameter key="except_value_type" value="time"/>
+        <parameter key="block_type" value="attribute_block"/>
+        <parameter key="use_block_type_exception" value="false"/>
+        <parameter key="except_block_type" value="value_matrix_row_start"/>
+        <parameter key="invert_selection" value="false"/>
+        <parameter key="include_special_attributes" value="false"/>
+        <parameter key="default_aggregation_function" value="average"/>
+        <list key="aggregation_attributes">
+          <parameter key="Revenue" value="average"/>
+          <parameter key="Revenue" value="median"/>
+          <parameter key="Revenue" value="mode"/>
+          <parameter key="Revenue" value="minimum"/>
+          <parameter key="Revenue" value="maximum"/>
+          <parameter key="Revenue" value="standard_deviation"/>
+          <parameter key="Revenue" value="percentile (5)"/>
+          <parameter key="Revenue" value="percentile (10)"/>
+          <parameter key="Revenue" value="percentile (25)"/>
+          <parameter key="Revenue" value="percentile (50)"/>
+          <parameter key="Revenue" value="percentile (75)"/>
+          <parameter key="Revenue" value="percentile (90)"/>
+          <parameter key="Revenue" value="percentile (95)"/>
+        </list>
+        <parameter key="group_by_attributes" value=""/>
+        <parameter key="count_all_combinations" value="false"/>
+        <parameter key="only_distinct" value="false"/>
+        <parameter key="ignore_missings" value="true"/>
+        <description align="center" color="transparent" colored="false" width="126">Stats Revenue (Manual Outlier)</description>
+      </operator>
+      <connect from_op="Retrieve Grocery" from_port="output" to_op="Filter Examples" to_port="example set input"/>
+      <connect from_op="Filter Examples" from_port="example set output" to_op="Subprocess" to_port="in 1"/>
+      <connect from_op="Subprocess" from_port="out 1" to_op="Multiply" to_port="input"/>
+      <connect from_op="Multiply" from_port="output 1" to_op="Detect Outlier (Distances)" to_port="example set input"/>
+      <connect from_op="Multiply" from_port="output 2" to_port="result 1"/>
+      <connect from_op="Multiply" from_port="output 3" to_op="Filter Examples (3)" to_port="example set input"/>
+      <connect from_op="Detect Outlier (Distances)" from_port="example set output" to_op="Filter Examples (2)" to_port="example set input"/>
+      <connect from_op="Filter Examples (2)" from_port="example set output" to_op="Multiply (3)" to_port="input"/>
+      <connect from_op="Multiply (3)" from_port="output 1" to_port="result 2"/>
+      <connect from_op="Multiply (3)" from_port="output 2" to_op="Aggregate" to_port="example set input"/>
+      <connect from_op="Multiply (3)" from_port="output 3" to_op="Aggregate (2)" to_port="example set input"/>
+      <connect from_op="Aggregate (2)" from_port="example set output" to_port="result 4"/>
+      <connect from_op="Aggregate" from_port="example set output" to_port="result 3"/>
+      <connect from_op="Filter Examples (3)" from_port="example set output" to_op="Multiply (4)" to_port="input"/>
+      <connect from_op="Multiply (4)" from_port="output 1" to_port="result 7"/>
+      <connect from_op="Multiply (4)" from_port="output 2" to_op="Stat Unit Sold" to_port="example set input"/>
+      <connect from_op="Multiply (4)" from_port="output 3" to_op="Stats Revenue" to_port="example set input"/>
+      <connect from_op="Stat Unit Sold" from_port="example set output" to_port="result 5"/>
+      <connect from_op="Stats Revenue" from_port="example set output" to_port="result 6"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+      <portSpacing port="sink_result 3" spacing="0"/>
+      <portSpacing port="sink_result 4" spacing="0"/>
+      <portSpacing port="sink_result 5" spacing="0"/>
+      <portSpacing port="sink_result 6" spacing="0"/>
+      <portSpacing port="sink_result 7" spacing="0"/>
+      <portSpacing port="sink_result 8" spacing="0"/>
+    </process>
+  </operator>
+</process>
